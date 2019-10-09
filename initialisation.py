@@ -13,10 +13,10 @@ def init_qz(qz, pz, y,t,x):
 
     optimizer = optim.Adam(qz.parameters(), lr=0.001)
 
-    for i in range(50):
+    for _ in range(50):
         batch = np.random.choice(idx, 1)
-        x_train, y_train, t_train = torch.cuda.FloatTensor(x[batch]), torch.cuda.FloatTensor(y[batch]), \
-                                    torch.cuda.FloatTensor(t[batch])
+        x_train, y_train, t_train = torch.FloatTensor(x[batch]), torch.FloatTensor(y[batch]), \
+                                    torch.FloatTensor(t[batch])
         xy = torch.cat((x_train, y_train), 1)
 
         z_infer = qz(xy=xy, t=t_train)

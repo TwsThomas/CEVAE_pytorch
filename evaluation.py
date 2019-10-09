@@ -48,7 +48,7 @@ def get_y0_y1(p_y_zt_dist, q_y_xt_dist, q_z_tyx_dist, x_train, t_train, L=1):
     xy = torch.cat((x_train.float(), y_infer.mean), 1)  # TODO take mean?
     z_infer = q_z_tyx_dist(xy=xy, t=t_train.float())
     # Manually input zeros and ones
-    y0 = p_y_zt_dist(z_infer.mean, torch.zeros(z_infer.mean.shape).cuda()).mean  # TODO take mean?
-    y1 = p_y_zt_dist(z_infer.mean, torch.ones(z_infer.mean.shape).cuda()).mean  # TODO take mean?
+    y0 = p_y_zt_dist(z_infer.mean, torch.zeros(z_infer.mean.shape)).mean  # TODO take mean?
+    y1 = p_y_zt_dist(z_infer.mean, torch.ones(z_infer.mean.shape)).mean  # TODO take mean?
 
     return y0.cpu().detach().numpy(), y1.cpu().detach().numpy()
