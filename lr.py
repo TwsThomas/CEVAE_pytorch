@@ -1,3 +1,9 @@
+"""
+Return LR1 and LR2, resutlts quit close from the paper (except maybe the sem)
+
+pytorch get nan if running with same archi than CEVAE.(tensroflow)
+"""
+
 from argparse import ArgumentParser
 
 from initialisation import init_qz

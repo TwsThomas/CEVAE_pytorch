@@ -10,6 +10,7 @@ https://github.com/AMLab-Amsterdam/CEVAE/blob/master/cevae_ihdp.py
 
 """
 from argparse import ArgumentParser
+from scipy.stats import sem
 
 from initialisation import init_qz
 from datasets import IHDP
@@ -31,20 +32,31 @@ from torch import optim
 parser = ArgumentParser()
 
 # Set Hyperparameters
-parser.add_argument('-reps', type=int, default=1)
+# parser.add_argument('-reps', type=int, default=10)
+# parser.add_argument('-z_dim', type=int, default=20)
+# parser.add_argument('-h_dim', type=int, default=64)
+# parser.add_argument('-epochs', type=int, default=100)
+# parser.add_argument('-batch', type=int, default=100)
+# parser.add_argument('-lr', type=float, default=0.00001)
+# parser.add_argument('-decay', type=float, default=0.001)
+# parser.add_argument('-print_every', type=int, default=10)
+
+parser.add_argument('-reps', type=int, default=10)
 parser.add_argument('-z_dim', type=int, default=20)
-parser.add_argument('-h_dim', type=int, default=64)
+parser.add_argument('-h_dim', type=int, default=200)
 parser.add_argument('-epochs', type=int, default=100)
 parser.add_argument('-batch', type=int, default=100)
-parser.add_argument('-lr', type=float, default=0.00001)
-parser.add_argument('-decay', type=float, default=0.001)
+parser.add_argument('-lr', type=float, default=0.001)
+parser.add_argument('-decay', type=float, default=0.0001)
 parser.add_argument('-print_every', type=int, default=10)
+
 
 args = parser.parse_args()
 
 dataset = IHDP(replications=args.reps)
 
 # Loop for replications
+l_score_train, l_score_test = [], []
 for i, (train, valid, test, contfeats, binfeats) in enumerate(dataset.get_train_valid_test()):
     print('\nReplication %i/%i' % (i + 1, args.reps))
     # read out data
@@ -181,10 +193,15 @@ for i, (train, valid, test, contfeats, binfeats) in enumerate(dataset.get_train_
             score_test = evaluator_test.calc_stats(y1, y0)
             print('Testset - ite: %f, ate: %f, pehe: %f' % score_test)
 
+
+    l_score_train.append(score_train)
+    l_score_test.append(score_test)
+
+
     plt.figure()
     plt.plot(np.array(loss['Total']), label='Total')
     plt.title('Variational Lower Bound')
-    plt.show()
+    # plt.show()
 
     plt.figure()
     subidx = 1
@@ -193,4 +210,18 @@ for i, (train, valid, test, contfeats, binfeats) in enumerate(dataset.get_train_
         plt.plot(np.array(value), label=key)
         plt.title(key)
         subidx += 1
-    plt.show()
+    # plt.show()
+
+print('Done',' -' * 20)
+print('Done',' -' * 20)
+print('Done',' -' * 20)
+l_score_train, l_score_test
+print('CEVAE_pytorch model total scores')
+means, stds = np.mean(l_score_train, axis=0), sem(l_score_train, axis=0)
+print('train ITE: {:.3f}+-{:.3f}, train ATE: {:.3f}+-{:.3f}, train PEHE: {:.3f}+-{:.3f}' \
+      ''.format(means[0], stds[0], means[1], stds[1], means[2], stds[2]))
+
+means, stds = np.mean(l_score_test, axis=0), sem(l_score_test, axis=0)
+print('test ITE: {:.3f}+-{:.3f}, test ATE: {:.3f}+-{:.3f}, test PEHE: {:.3f}+-{:.3f}' \
+      ''.format(means[0], stds[0], means[1], stds[1], means[2], stds[2]))
+ 
